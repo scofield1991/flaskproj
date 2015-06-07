@@ -1,0 +1,59 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+ <script type=text/javascript>
+    $(function() {
+      $('a#calculate').bind('click', function() {
+        var catid;
+        catid = $(this).attr("data-catid")
+        $.getJSON('/_add_numbers', {
+          c: catid
+        }, function(data) {
+          $("#like_count"+catid).text(data.result);
+        });
+        return false;
+      });
+    });
+  </script>
+<div class="alert alert-success">
+        <p>Question: 
+            <b>{{post.body}}</b>
+        </p>
+</div>
+<div class="jumbotron">
+    <h2>User's answers</h2> 
+    <hr>
+    <ol>
+{% for answer in answers %}
+        <li>{{answer.body}}<br>
+
+        <strong id="like_count{{answer.id}}">{{ answer.likes }}</strong> likes
+
+{% if g.user.is_authenticated() %}
+       
+        <p><a href="javascript:void();" data-catid="{{answer.id}}" id="calculate" class="btn btn-info btn-sm">Like</a>
+{% endif %}
+
+        </li>
+
+{% endfor %}
+    </ol>
+</div>
+{% if g.user.is_authenticated() %}
+    <form action="" method="post" name="post">
+    {{form.hidden_tag()}}
+        <label >Post your answer:</label>
+        <div class="form-group">
+           {{ form.answer(size = 30, maxlength = 140,  class="form-control" ,rows="5") }}
+        </div>
+            {% for error in form.errors.answer %}
+            <span style="color: red;">[{{error}}]</span><br>
+            {% endfor %}
+        <input type="submit" value="Post!" class="btn btn-large btn-primary ">
+           
+    </form> 
+{% endif %}
+
+{% endblock %}
+
