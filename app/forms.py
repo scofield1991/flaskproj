@@ -12,6 +12,16 @@ class SignupForm(Form):
     email = TextField("Email",  [Required("Please enter your email address."), Email("Please enter your email address.")])
     password = PasswordField('Password', [Required("Please enter a password.")])
     
+    def validate(self):
+       if not Form.validate(self):
+           return False
+
+       user_email = User.query.filter_by(email = self.email.data.lower()).first()
+       user_name= User.query.filter_by(nickname = self.nickname.data.lower()).first()
+       if user_email or user_name:
+           self.email.errors.append("These e-mail or nickname are already used")
+           return False
+    
     def __init__(self, *args, **kwargs):
         Form.__init__(self, *args, **kwargs)
 
